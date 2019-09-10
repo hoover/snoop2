@@ -29,9 +29,6 @@ idna = '*'
 kombu = '*'
 langdetect = '*'
 more-itertools = '*'
-morpheus = '*'
-Morfessor = '*'
-numpy = '*'
 opencensus = '*'
 pip-tools = '*'
 pluggy = '*'
@@ -67,6 +64,9 @@ Pygments = '*'
 PyICU = '*'
 opencensus-ext-prometheus = "*"
 opencensus-ext-zipkin = "*"
+morpheus = "*"
+morfessor = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.6"
