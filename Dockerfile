@@ -12,7 +12,6 @@ RUN set -e \
      poppler-utils \
      libgsf-1-dev \
      postgresql-client \
-     python-numpy \
      libicu-dev \
  && cpanm --notest Email::Outlook::Message \
  && apt-get clean && rm -rf /var/lib/apt/lists/* \
