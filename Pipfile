@@ -65,6 +65,7 @@ PyICU = '*'
 opencensus-ext-prometheus = "*"
 opencensus-ext-zipkin = "*"
 morfessor = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.6"
