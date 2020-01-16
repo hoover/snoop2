@@ -64,6 +64,7 @@ Pygments = '*'
 PyICU = '*'
 opencensus-ext-prometheus = "*"
 opencensus-ext-zipkin = "*"
+s3fs = "*"
 
 [requires]
 python_version = "3.6"
