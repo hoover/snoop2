@@ -13,6 +13,7 @@ def get_size_for_blobs(apps, schema_editor):
         path = BLOB_ROOT / sha3_256[:2] / sha3_256[2:4] / sha3_256[4:]
         blob.size = path.stat().st_size
         blob.save()
+    pass
 
 
 def noop(apps, schema_editor):
@@ -37,5 +38,6 @@ class Migration(migrations.Migration):
             name='size',
             field=models.BigIntegerField(),
         ),
-        migrations.RunPython(get_size_for_blobs, noop),
+        # Commented out because SNOOP_BLOB_STORAGE doesn't exist anymore
+        # migrations.RunPython(get_size_for_blobs, noop),
     ]

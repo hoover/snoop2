@@ -3,6 +3,8 @@ import re
 from datetime import timedelta
 from pathlib import Path
 
+import s3fs
+
 from snoop.data import celery
 
 base_dir = Path(__file__).resolve().parent.parent
@@ -93,11 +95,30 @@ STATIC_ROOT = str(base_dir / 'static')
 SNOOP_COLLECTION_NAME = os.environ.get('SNOOP_ES_INDEX', 'snoop')
 SNOOP_COLLECTIONS_ELASTICSEARCH_URL = os.environ.get('SNOOP_ES_URL', 'http://localhost:9200')
 
-SNOOP_BLOB_STORAGE = str(base_dir / 'blobs')
+SNOOP_BLOB_MINIO_ADDRESS = os.environ.get('SNOOP_BLOB_MINIO_ADDRESS', 'http://minio-blobs:19000')
+SNOOP_BLOB_MINIO_ACCESS_KEY = os.environ.get('SNOOP_BLOB_MINIO_ACCESS_KEY', 'minioadmin')
+SNOOP_BLOB_MINIO_SECRET_KEY = os.environ.get('SNOOP_BLOB_MINIO_SECRET_KEY', 'minioadmin')
+s3blobs = s3fs.S3FileSystem(
+    key=SNOOP_BLOB_MINIO_ACCESS_KEY,
+    secret=SNOOP_BLOB_MINIO_ACCESS_KEY,
+    kwargs={"endpoint_url": SNOOP_BLOB_MINIO_ADDRESS}
+)
+assert s3src.isdir('blobs'), 'SNOOP_BLOB_MINIO has no bucket "blobs"'
+
+SNOOP_SOURCE_MINIO_ADDRESS = os.environ.get('SNOOP_SOURCE_MINIO_ADDRESS', 'http://minio-src:29000')
+SNOOP_SOURCE_MINIO_ACCESS_KEY = os.environ.get('SNOOP_SOURCE_MINIO_ACCESS_KEY', 'minioadmin')
+SNOOP_SOURCE_MINIO_SECRET_KEY = os.environ.get('SNOOP_SOURCE_MINIO_SECRET_KEY', 'minioadmin')
+s3src = s3fs.S3FileSystem(
+    key=SNOOP_SOURCE_MINIO_ACCESS_KEY,
+    secret=SNOOP_SOURCE_MINIO_ACCESS_KEY,
+    kwargs={"endpoint_url": SNOOP_SOURCE_MINIO_ADDRESS}
+)
+assert s3src.isdir('data'), 'SNOOP_SOURCE_MINIO has no bucket "data"'
+
+
 SNOOP_TIKA_URL = os.environ.get('SNOOP_TIKA_URL', 'http://localhost:9998')
 SNOOP_FEED_PAGE_SIZE = 100
 SNOOP_COLLECTIONS_ELASTICSEARCH_INDEX = os.environ.get('SNOOP_ES_INDEX', 'snoop2')
-SNOOP_COLLECTION_ROOT = os.environ.get('SNOOP_COLLECTION_ROOT')
 SNOOP_STATS_ELASTICSEARCH_URL = os.environ.get('SNOOP_STATS_ES_URL', None)
 SNOOP_STATS_ELASTICSEARCH_INDEX_PREFIX = os.environ.get('SNOOP_STATS_ES_PREFIX', '_snoopstats-')
 TASK_PREFIX = os.environ.get('SNOOP_TASK_PREFIX', '')

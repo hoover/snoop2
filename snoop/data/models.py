@@ -12,7 +12,7 @@ from .magic import Magic, looks_like_email, looks_like_emlx_email, \
     looks_like_mbox
 from . import stats
 
-BLOB_ROOT = Path(settings.SNOOP_BLOB_STORAGE)
+BLOB_ROOT = Path("blob")
 BLOB_TMP = BLOB_ROOT / 'tmp'
 
 

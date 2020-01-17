@@ -9,6 +9,25 @@ services:
     volumes:
       - ./volumes/snoop-pg/data:/var/lib/postgresql/data
 
+
+  minio-src:
+    image: minio/minio
+    volumes:
+      - /opt/hoover/snoop/docker-setup/collections/testdata:/data
+    ports:
+      - "29000:9000"
+    command: server /data
+
+
+  minio-blobs:
+    image: minio/minio
+    volumes:
+      - ./snoop-blobs:/data
+    ports:
+      - "19000:9000"
+    command: server /data
+
+
   snoop:
     image: snoop2-testing
     environment:
@@ -19,7 +38,6 @@ services:
       - ./collections:/opt/hoover/collections
       - ./volumes/search-es-snapshots:/opt/hoover/es-snapshots
       - ../testsuite/snoop-settings.py:/opt/hoover/snoop/snoop/localsettings.py
-      - ./snoop-blobs:/opt/hoover/snoop/blobs
     env_file:
       - ./settings/snoop.testing.env
     environment:
@@ -31,6 +49,8 @@ services:
       - snoop-pg
       - search-es
       - snoop-tika
+      - minio-source
+      - minio-blobs
 
   snoop-worker:
     image: snoop2-testing
@@ -46,8 +66,9 @@ services:
       - ./collections:/opt/hoover/collections
       - ./volumes/search-es-snapshots:/opt/hoover/es-snapshots
       - ../testsuite/snoop-settings.py:/opt/hoover/snoop/snoop/localsettings.py
-      - ./snoop-blobs:/opt/hoover/snoop/blobs
     depends_on:
       - snoop-pg
       - search-es
       - snoop-tika
+      - minio-source
+      - minio-blobs
