@@ -1,12 +1,6 @@
-import os
 import subprocess
 import re
-from pathlib import Path
 from .utils import read_exactly
-
-MAGIC_URL = 'https://github.com/liquidinvestigations/magic-definitions/raw/master/magic.mgc'
-MAGIC_FILE = Path(os.getenv('MAGIC_FILE'))
-assert MAGIC_FILE.exists()
 
 
 class Magic:
@@ -14,14 +8,18 @@ class Magic:
     def __init__(self):
         self.mime_process = subprocess.Popen(
             [
-                'file', '-', '--mime-type', '--mime-encoding', '-k',
-                '-m', str(MAGIC_FILE),
+                'file', '-',
+                '--mime-type',
+                '--mime-encoding',
+                '-k',
+                # this seems to put the relevant type first
+                '--extension',
             ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
         )
         self.magic_process = subprocess.Popen(
-            ['file', '-', '-k', '-m', str(MAGIC_FILE)],
+            ['file', '-', '-k'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
         )

@@ -25,13 +25,6 @@ RUN set -e \
 # disable tesseract multithreading
 ENV OMP_THREAD_LIMIT 1
 
-# download magic files
-RUN cd /opt \
-  && git clone https://github.com/liquidinvestigations/magic-definitions.git \
-  && ( cd magic-definitions && ./build.sh )
-ENV PATH="/opt/magic-definitions/file/bin:${PATH}"
-ENV MAGIC_FILE="/opt/magic-definitions/magic.mgc"
-
 # download libpst
 ENV LIBPST_VERSION libpst-0.6.74
 RUN wget http://www.five-ten-sg.com/libpst/packages/$LIBPST_VERSION.tar.gz --progress=dot:giga \
