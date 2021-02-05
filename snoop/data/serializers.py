@@ -73,6 +73,7 @@ class DocumentUserTagSerializer(serializers.ModelSerializer):
         data['digest_id'] = self.context['digest_id']
         return super().update(instance, data)
 
+
 class EntitySerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -815,6 +815,7 @@ class DocumentUserTag(models.Model):
 class Entity(models.Model):
     entity = models.CharField(max_length=256, unique=True)
     label = models.CharField(max_length=256)
+
     def __str__(self):
         return f'entity {self.pk}: entity={self.entity} label={self.label}'
 
