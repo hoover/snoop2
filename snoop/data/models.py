@@ -812,6 +812,13 @@ class DocumentUserTag(models.Model):
         digests.retry_index(self.blob)
 
 
+class Entity(models.Model):
+    entity = models.CharField(max_length=256, unique=True)
+    label = models.CharField(max_length=256)
+    def __str__(self):
+        return f'entity {self.pk}: entity={self.entity} label={self.label}'
+
+
 class OcrSource(models.Model):
     """Database model for a directory on disk containing External OCR files.
     """

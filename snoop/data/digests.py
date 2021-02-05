@@ -27,6 +27,7 @@ from .utils import zulu
 from .analyzers import email
 from .analyzers import tika
 from .analyzers import exif
+from .analyzers import entities
 from . import ocr
 from ._file_types import FILE_TYPES
 from . import indexing
@@ -142,17 +143,24 @@ def gather(blob, **depends_on):
                 rv['ocrimage'] = True
         rv['ocrtext'] = ocr_results
 
-    # combine texts and detect language
-    if settings.DETECT_LANGUAGE:
+    #TODO: Add entity Extraction setting to snoop settings
+    if settings.EXTRACT_ENTITIES:
+        text = rv.get('text', '')
+        ocrtexts = [v for v in rv.get('ocrtext', {}).values() if v]
+        if text or ocrtexts:
+            alltext = text + "\n" + "\n".join(ocrtexts)
+            nlp_response = entities.get_entities(alltext)
+            ents = nlp_response['entities']
+            if settings.DETECT_LANGUAGE:
+                rv['lang'] = nlp_response['language']
+            rv['entities']= [(k['text'], k['label']) for k in ents]
+
+    if settings.DETECT_LANGUAGE and not 'lang' in rv:
         text = rv.get('text', '')[:2500]
         ocrtexts = [v[:2500] for v in rv.get('ocrtext', {}).values() if v]
         if text or ocrtexts:
             alltext = text + "\n" + "\n".join(ocrtexts)
-            try:
-                rv['lang'] = language_detector(alltext)
-            except Exception as e:
-                log.debug(f'Unable to detect language for document {id}: {e}')
-                rv['lang'] = None
+            rv['lang'] = entities.get_language(alltext)
 
     # try and extract exif data
     exif_data_blob = depends_on.get('exif_data')
