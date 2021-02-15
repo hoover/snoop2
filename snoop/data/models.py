@@ -696,6 +696,7 @@ class Digest(models.Model):
 
     result = models.ForeignKey(
         Blob,
+        null=True,
         on_delete=models.RESTRICT,
         related_name='+',
     )
@@ -812,12 +813,41 @@ class DocumentUserTag(models.Model):
         digests.retry_index(self.blob)
 
 
+class EntityType(models.Model):
+    type = models.CharField(max_length=256, unique=True)
+
+
 class Entity(models.Model):
-    entity = models.CharField(max_length=256, unique=True)
-    label = models.CharField(max_length=256)
+    entity = models.CharField(max_length=256)
+    type = models.ForeignKey(EntityType, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', blank=True, null=True,
+                               related_name='children', on_delete=models.CASCADE)
+    blacklisted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('entity', 'type')
 
     def __str__(self):
-        return f'entity {self.pk}: entity={self.entity} label={self.label}'
+        return f'entity {self.pk}: entity={self.entity} type={self.type}'
+
+
+
+class LanguageModel(models.Model):
+    language_code = models.CharField(max_length=3)
+    engine = models.CharField(max_length=256)
+    description = models.CharField(max_length=256, unique=True)
+
+    def __str__(self):
+        return self.description
+
+
+class EntityHit(models.Model):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    digest = models.ForeignKey(Digest, on_delete=models.CASCADE)
+    model = models.ForeignKey(LanguageModel, on_delete=models.RESTRICT)
+    text_source = models.CharField(max_length=256)
+    start = models.PositiveIntegerField()
+    end = models.PositiveIntegerField()
 
 
 class OcrSource(models.Model):
