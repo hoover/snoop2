@@ -143,25 +143,6 @@ def gather(blob, **depends_on):
                 rv['ocrimage'] = True
         rv['ocrtext'] = ocr_results
 
-    # TODO: Add entity Extraction setting to snoop settings
-    if settings.EXTRACT_ENTITIES:
-        text = rv.get('text', '')
-        ocrtexts = [v for v in rv.get('ocrtext', {}).values() if v]
-        if text or ocrtexts:
-            alltext = text + "\n" + "\n".join(ocrtexts)
-            nlp_response = entities.get_entities(alltext)
-            ents = nlp_response['entities']
-            if settings.DETECT_LANGUAGE:
-                rv['lang'] = nlp_response['language']
-            rv['entities'] = [(k['text'], k['label']) for k in ents]
-
-    if settings.DETECT_LANGUAGE and 'lang' not in rv:
-        text = rv.get('text', '')[:2500]
-        ocrtexts = [v[:2500] for v in rv.get('ocrtext', {}).values() if v]
-        if text or ocrtexts:
-            alltext = text + "\n" + "\n".join(ocrtexts)
-            rv['lang'] = entities.get_language(alltext)
-
     # try and extract exif data
     exif_data_blob = depends_on.get('exif_data')
     if exif_data_blob:
@@ -175,15 +156,23 @@ def gather(blob, **depends_on):
             rv['location'] = exif_data.get('location')
             rv['date-created'] = exif_data.get('date-created')
 
+    digest, _ = models.Digest.objects.get_or_create(blob=blob)
+
+    # Entity Extraction and language detection
+    if settings.EXTRACT_ENTITIES:
+        text = rv.get('text', '')
+        if text:
+            text_ents = entities.extract_enitities(text, 'text', digest)
+            rv['entities'] = text_ents['entities']
+            rv['lang'] = text_ents['lan']
+        ocrtexts = rv.get('ocrtext')
+        # if ocrtexts:
+
     with models.Blob.create() as writer:
         writer.write(json.dumps(rv).encode('utf-8'))
 
-    _, _ = models.Digest.objects.update_or_create(
-        blob=blob,
-        defaults=dict(
-            result=writer.blob,
-        ),
-    )
+        digest.result = writer.blob
+        digest.save()
 
     return writer.blob
 

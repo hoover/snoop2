@@ -1,5 +1,4 @@
 *.pyc
-*.code-workspace
 /.cache
 /blobs
 /snoop/localsettings.py
