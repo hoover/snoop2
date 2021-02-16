@@ -162,13 +162,11 @@ def gather(blob, **depends_on):
     if settings.EXTRACT_ENTITIES:
         text = rv.get('text', '')
         if text:
-            text_ents = entities.extract_enitities(text, 'text', digest)
-            rv['entities'] = text_ents['entities']
-            rv['lang'] = text_ents['lan']
+            rv.update(entities.extract_enitities(text, 'text', digest))
         if ocr_results:
             for ocr_name, ocrtext in rv.get('ocrtext'):
-                text_ents = entities.extract_enitities(ocrtext, ocr_name, digest)
-                rv[f'entities.{ocr_name}'] = text_ents['entities']
+                if ocrtext:
+                    rv.update(entities.extract_enitities(ocrtext, ocr_name, digest))
 
     with models.Blob.create() as writer:
         writer.write(json.dumps(rv).encode('utf-8'))
