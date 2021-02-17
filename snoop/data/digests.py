@@ -15,7 +15,8 @@ import logging
 import json
 import re
 import subprocess
-
+from datetime import timedelta
+from collections import defaultdict
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -157,6 +158,7 @@ def gather(blob, **depends_on):
             rv['date-created'] = exif_data.get('date-created')
 
     digest, _ = models.Digest.objects.get_or_create(blob=blob)
+    rv = defaultdict([], rv)
 
     # Entity Extraction and language detection
     if settings.EXTRACT_ENTITIES:
@@ -166,7 +168,15 @@ def gather(blob, **depends_on):
         if ocr_results:
             for ocr_name, ocrtext in rv.get('ocrtext'):
                 if ocrtext:
-                    rv.update(entities.extract_enitities(ocrtext, ocr_name, digest))
+                    ocr_results = entities.extract_enitities(ocrtext, ocr_name, digest)
+                    if 'entities' in rv:
+                        rv['entities'].extend(ocr_results['entities'])
+                        rv['ent-ids'].extend(ocr_results['ent-ids'])
+                        for k, v in ocr_results:
+                            if k.startswith('entity-type.'):
+                                rv[k].extend(v)
+                    else:
+                        rv.update(ocr_results)
 
     with models.Blob.create() as writer:
         writer.write(json.dumps(rv).encode('utf-8'))

@@ -53,14 +53,14 @@ def extract_enitities(text, text_source, digest):
         create_db_entries(entity, nlp_response['model'],
                           nlp_response['language'], text_source, digest)
     if settings.DETECT_LANGUAGE:
-        results['lan'] = nlp_response['language']
-        results[f'entities.{text_source}'] = [k['text'] for k in ents]
+        results['lang'] = nlp_response['language']
+        results['entities'] = [k['text'] for k in ents]
         unique_ents = set([(k['text'], k['type']) for k in ents])
-        results[f'ent-ids.{text_source}'] = [models.Entity.objects.get(entity=k[0], type=k[1]).id
-                                             for k in unique_ents]
+        results['ent-ids'] = [models.Entity.objects.get(entity=k[0], type=k[1]).id
+                              for k in unique_ents]
         for entity_type in set(v['type'] for v in results['entities']):
-            results[f'entity.{entity_type}.{text_source}'] = [k[0] for k in unique_ents
-                                                              if k[1] == entity_type]
+            results[f'entity-type.{entity_type}'] = [k[0] for k in unique_ents
+                                                     if k[1] == entity_type]
 
     if settings.DETECT_LANGUAGE and 'lang' not in results:
         text = text[:2500]
