@@ -24,6 +24,7 @@ ES_URL = settings.SNOOP_COLLECTIONS_ELASTICSEARCH_URL
 
 PUBLIC_TAGS_FIELD_NAME = 'tags'
 PRIVATE_TAGS_FIELD_NAME_PREFIX = 'priv-tags.'
+ENTITY_TYPE_PREFIX= 'entity-type.'
 
 MAPPINGS = {
     "doc": {
@@ -56,6 +57,9 @@ MAPPINGS = {
             PUBLIC_TAGS_FIELD_NAME: {"type": "keyword"},
             # remove the trailing '.' here
             PRIVATE_TAGS_FIELD_NAME_PREFIX[:-1]: {"type": "object"},
+            "entities": {"type": "text"},
+            "entity-ids": {"type": "integer"},
+            ENTITY_TYPE_PREFIX[:-1]: {"type": "object"},
         },
         "dynamic_templates": [
             {
@@ -63,6 +67,13 @@ MAPPINGS = {
                     "match_mapping_type": "*",
                     "path_match": PRIVATE_TAGS_FIELD_NAME_PREFIX + "*",
                     "mapping": {"type": "keyword"},
+                },
+            },
+            {
+                "entity_types_are_texts": {
+                    "match_mapping_type": "*",
+                    "path_match": ENTITY_TYPE_PREFIX + "*",
+                    "mapping": {"type": "text"},
                 },
             },
         ],

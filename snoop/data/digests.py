@@ -209,6 +209,12 @@ def _get_tags(digest):
     return ret
 
 
+def _get_entity_types(digest_data):
+    return dict(filter(lambda item: item[0].startswith('entity-type.'),
+                digest_data.items()))
+
+
+
 def _set_tags_timestamps(digest, body):
     """ Sets 'date-indexed' on all tagas from the body.
 
@@ -567,6 +573,8 @@ def _get_document_content(digest, the_file=None):
         'ocrtext': {k: v for k, v in digest_data.get('ocrtext', {}).items() if v},
         'ocrpdf': digest_data.get('ocrpdf'),
         'ocrimage': digest_data.get('ocrimage'),
+        'entities': digest_data.get('entities'),
+        'entity-ids': digest_data.get('entity-ids'),
 
         # TODO 7zip, unzip, all of these will list the correct access/creation
         # times when listing, but don't preserve them when unpacking.
@@ -595,6 +603,10 @@ def _get_document_content(digest, the_file=None):
 
     text = content.get('text') or ""
     content['word-count'] = len(text.strip().split())
+
+    entity_types = _get_entity_types(digest_data)
+    if entity_types:
+        content.update(entity_types)
 
     return content
 
