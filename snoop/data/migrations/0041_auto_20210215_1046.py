@@ -3,15 +3,18 @@
 from django.db import migrations
 
 entity_type_list = ['ORG', 'PER', 'LOC', 'CARDINAL', 'DATE', 'EVENT', 'FAC', 'GPE',
-                    'LANGUAGE', 'MONEY', 'NORP', 'ORDINAL', 'PERCENT', 'PERSON', 'PRODUCT', 'QUANTITY',
-                    'TIME', 'WORK_OF_ART']
+                    'LANGUAGE', 'MONEY', 'NORP', 'ORDINAL', 'PERCENT', 'PERSON',
+                    'PRODUCT', 'QUANTITY', 'TIME', 'WORK_OF_ART']
 
 
 def create_entity_types(apps, schema_editor):
     Type_model = apps.get_model('data', 'EntityType')
-    for entity in entity_type_list:
-        type_entry = Type_model(type=entity)
-        type_entry.save()
+    db_alias = schema_editor.connection.alias
+    Type_model.objects.using(db_alias)
+    Type_model.objects.using(db_alias).bulk_create([
+        Type_model(type=entity)
+        for entity in entity_type_list
+    ])
 
 
 class Migration(migrations.Migration):
