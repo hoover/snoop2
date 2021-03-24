@@ -220,7 +220,6 @@ def _get_entity_types(digest_data):
                 digest_data.items()))
 
 
-
 def _set_tags_timestamps(digest, body):
     """ Sets 'date-indexed' on all tagas from the body.
 

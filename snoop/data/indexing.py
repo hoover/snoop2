@@ -24,7 +24,7 @@ ES_URL = settings.SNOOP_COLLECTIONS_ELASTICSEARCH_URL
 
 PUBLIC_TAGS_FIELD_NAME = 'tags'
 PRIVATE_TAGS_FIELD_NAME_PREFIX = 'priv-tags.'
-ENTITY_TYPE_PREFIX= 'entity-type.'
+ENTITY_TYPE_PREFIX = 'entity-type.'
 
 MAPPINGS = {
     "doc": {

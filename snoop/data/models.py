@@ -831,7 +831,6 @@ class Entity(models.Model):
         return f'entity {self.pk}: entity={self.entity} type={self.type}'
 
 
-
 class LanguageModel(models.Model):
     language_code = models.CharField(max_length=3)
     engine = models.CharField(max_length=256)
