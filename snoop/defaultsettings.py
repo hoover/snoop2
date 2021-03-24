@@ -169,12 +169,8 @@ LANGUAGE_CODE = 'en-us'
 """Django locale."""
 
 DETECT_LANGUAGE = True
-"""Enable language detection."""
-
-LANGUAGE_DETECTOR_NAME = 'polyglot'
-"""Configure which language detector library to use.
-"""
-
+EXTRACT_ENTITIES = True
+NLP_SERVICE_URL = os.environ.get('SNOOP_NLP_URL', 'http://127.0.0.1:5000/')
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True

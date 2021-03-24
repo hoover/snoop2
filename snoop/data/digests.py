@@ -32,10 +32,8 @@ from .analyzers import entities
 from . import ocr
 from ._file_types import FILE_TYPES
 from . import indexing
-from snoop.data import language_detection
 
 log = logging.getLogger(__name__)
-language_detector = language_detection.detectors.get(settings.LANGUAGE_DETECTOR_NAME, None)
 ES_MAX_INTEGER = 2 ** 31 - 1
 
 
@@ -177,6 +175,14 @@ def gather(blob, **depends_on):
                                 rv[k].extend(v)
                     else:
                         rv.update(ocr_results)
+    elif settings.DETECT_LANGUAGE:
+        text = rv.get('text', '')[:2500]
+        if text:
+            rv.update(entities.get_language(text))
+        if ocr_results:
+            for ocr_name, ocrtext in rv.get('ocrtext'):
+                if ocrtext:
+                    rv[f'{ocr_name}_lan'] = entities.get_language(ocrtext[:2500])
 
     with models.Blob.create() as writer:
         writer.write(json.dumps(rv).encode('utf-8'))

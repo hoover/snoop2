@@ -57,9 +57,10 @@ MAPPINGS = {
             PUBLIC_TAGS_FIELD_NAME: {"type": "keyword"},
             # remove the trailing '.' here
             PRIVATE_TAGS_FIELD_NAME_PREFIX[:-1]: {"type": "object"},
+            ENTITY_TYPE_PREFIX[:-1]: {"type": "object"},
             "entities": {"type": "text"},
             "entity-ids": {"type": "integer"},
-            ENTITY_TYPE_PREFIX[:-1]: {"type": "object"},
+
         },
         "dynamic_templates": [
             {
