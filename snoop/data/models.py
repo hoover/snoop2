@@ -814,10 +814,20 @@ class DocumentUserTag(models.Model):
 
 
 class EntityType(models.Model):
+    """ Database model for an entity type. Per data migration, the following are added
+    automatically:
+    ['ORG', 'PER', 'LOC', 'CARDINAL', 'DATE', 'EVENT', 'FAC', 'GPE',
+    'LANGUAGE', 'MONEY', 'NORP', 'ORDINAL', 'PERCENT', 'PERSON',
+    'PRODUCT', 'QUANTITY', 'TIME', 'WORK_OF_ART']
+    """
     type = models.CharField(max_length=256, unique=True)
 
 
 class Entity(models.Model):
+    """ Database model for Entities. Entities have a textfield for their string
+    and a type. Additionally, they may have a parent (if merged), or can be
+    blacklisted (so not shown as entities).
+    """
     entity = models.CharField(max_length=256)
     type = models.ForeignKey(EntityType, on_delete=models.CASCADE)
     parent = models.ForeignKey('self', blank=True, null=True,
@@ -832,6 +842,13 @@ class Entity(models.Model):
 
 
 class LanguageModel(models.Model):
+    """ Database model for language models. This can be  used to filter for
+    specific results of language models.
+    The language code is the language code of the used language, or 'mlt' for
+    multilingual models. The engine is either `spacy` or `polyglot`.
+    The description is the string of the model, for example 'xx_ent_wiki_sm'
+    for the multilingual spacy model which is based on the WikiNER data set.
+    """
     language_code = models.CharField(max_length=3)
     engine = models.CharField(max_length=256)
     description = models.CharField(max_length=256, unique=True)
@@ -841,6 +858,12 @@ class LanguageModel(models.Model):
 
 
 class EntityHit(models.Model):
+    """ Database model for an entitiy hit.
+    An entity hit is a hit of an entitiy in a text source, which means that the
+    entity was found in the text (more specific between index start and end).
+    The used language model is also stored as a foreign key in order to discern which
+    language model produced the hit.
+    """
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     digest = models.ForeignKey(Digest, on_delete=models.CASCADE)
     model = models.ForeignKey(LanguageModel, on_delete=models.CASCADE)

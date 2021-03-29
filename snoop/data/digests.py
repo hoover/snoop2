@@ -15,8 +15,6 @@ import logging
 import json
 import re
 import subprocess
-from datetime import timedelta
-from collections import defaultdict
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.utils import timezone
