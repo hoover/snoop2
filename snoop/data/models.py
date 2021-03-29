@@ -843,7 +843,7 @@ class LanguageModel(models.Model):
 class EntityHit(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     digest = models.ForeignKey(Digest, on_delete=models.CASCADE)
-    model = models.ForeignKey(LanguageModel, on_delete=models.RESTRICT)
+    model = models.ForeignKey(LanguageModel, on_delete=models.CASCADE)
     text_source = models.CharField(max_length=256)
     start = models.PositiveIntegerField()
     end = models.PositiveIntegerField()

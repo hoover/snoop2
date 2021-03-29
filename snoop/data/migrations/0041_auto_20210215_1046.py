@@ -17,6 +17,10 @@ def create_entity_types(apps, schema_editor):
     ])
 
 
+def noop(apps, schema_editor):
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -24,5 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_entity_types),
+        migrations.RunPython(create_entity_types, noop),
     ]
