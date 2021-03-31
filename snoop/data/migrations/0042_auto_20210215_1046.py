@@ -24,7 +24,7 @@ def noop(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('data', '0040_auto_20210215_1045'),
+        ('data', '0041_auto_20210215_1045'),
     ]
 
     operations = [
