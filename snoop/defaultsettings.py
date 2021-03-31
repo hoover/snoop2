@@ -171,7 +171,7 @@ LANGUAGE_CODE = 'en-us'
 
 DETECT_LANGUAGE = True
 EXTRACT_ENTITIES = True
-NLP_SERVICE_URL = os.environ.get('SNOOP_NLP_URL', 'http://127.0.0.1:5000/')
+SNOOP_NLP_URL = os.environ.get('SNOOP_NLP_URL', 'http://127.0.0.1:5000/')
 """ URL pointing to NLP server"""
 
 

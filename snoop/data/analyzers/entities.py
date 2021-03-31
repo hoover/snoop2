@@ -10,8 +10,6 @@ from urllib.parse import urljoin
 import requests
 from collections import defaultdict
 
-NLP_SERVICE_URL = settings.NLP_SERVICE_URL
-
 
 def call_nlp_server(endpoint, data_dict):
     """Sends a request to the nlp service with a specified endpoint and a data load as json.
@@ -20,7 +18,7 @@ def call_nlp_server(endpoint, data_dict):
     and can optionally also contain a key `language`, if the language is already specified.
     The response of the service will be JSON, which is decoded before returning.
     """
-    url = urljoin(NLP_SERVICE_URL, endpoint)
+    url = urljoin(settings.SNOOP_NLP_URL, endpoint)
     resp = requests.post(url, json=data_dict)
     if (resp.status_code != 200):
         raise RuntimeError(f'Unexpected response from nlp service: {resp.content}')
@@ -101,7 +99,7 @@ def process_document(digest, rv):
     If not:
     only the detected language is returned for all text sources.
     """
-    results = defaultdict([])
+    results = defaultdict(defaultvalue)
     if settings.EXTRACT_ENTITIES:
         text = rv.get('text', '')
         if text:
@@ -128,3 +126,7 @@ def process_document(digest, rv):
                 if ocrtext:
                     results[f'{ocr_name}_lang'] = get_language(ocrtext[:2500])
     return results
+
+
+def defaultvalue():
+    return []
