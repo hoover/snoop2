@@ -822,6 +822,11 @@ class EntityType(models.Model):
     """
     type = models.CharField(max_length=256, unique=True)
 
+    def __str__(self):
+        return f'{self.type}'
+
+    __repr__ = __str__
+
 
 class Entity(models.Model):
     """ Database model for Entities. Entities have a textfield for their string
@@ -838,7 +843,9 @@ class Entity(models.Model):
         unique_together = ('entity', 'type')
 
     def __str__(self):
-        return f'entity {self.pk}: entity={self.entity} type={self.type}'
+        return f'{self.entity}'
+
+    __repr__ = __str__
 
 
 class LanguageModel(models.Model):
@@ -856,6 +863,8 @@ class LanguageModel(models.Model):
     def __str__(self):
         return self.description
 
+    __repr__ = __str__
+
 
 class EntityHit(models.Model):
     """ Database model for an entitiy hit.
@@ -870,6 +879,11 @@ class EntityHit(models.Model):
     text_source = models.CharField(max_length=256)
     start = models.PositiveIntegerField()
     end = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f'{self.entity}'
+
+    __repr__ = __str__
 
 
 class OcrSource(models.Model):

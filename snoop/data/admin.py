@@ -36,6 +36,23 @@ def blob_link(blob_pk):
     return mark_safe(f'<a href="{url}">{blob_pk[:10]}...{blob_pk[-4:]}</a>')
 
 
+
+def create_link(model_name, pk, url_description):
+    """Creates a link to any other Data entry in the database.
+
+    It uses the auto generated urls from django admin and takes the description
+    as input.
+
+    Args:
+        model_name: The name of the model that the entry belongs to
+        pk: the pk of the object
+        url_description: The string that the link should show.
+    """
+
+    url = reverse(f'{collections.current().name}:data_{model_name.lower()}_change', args=[pk])
+    return mark_safe(f'<a href="{url}">{url_description}</a>')
+
+
 def raw_sql(query):
     """Execute SQL string in current collection database."""
     col = collections.current()
@@ -252,6 +269,69 @@ class DirectoryAdmin(MultiDBModelAdmin):
     list_display = ['pk', '__str__', 'name', 'date_created', 'date_modified']
 
 
+
+class EntityAdmin(MultiDBModelAdmin):
+    """List and detail views for entities."""
+
+    raw_id_fields = ['type']
+    search_fields = ['__str__', 'type']
+    readonly_fields = [
+        'pk',
+        '__str__',
+        'type',
+        'parent_link',
+        'blacklisted',
+    ]
+    list_display = ['pk', '__str__', 'type', 'parent_link', 'blacklisted']
+
+    def parent_link(self, obj):
+        with self.collection.set_current():
+            if obj.parent:
+                return create_link('entity', obj.parent.pk, obj.parent)
+            return '/'
+
+
+class EntityHitAdmin(MultiDBModelAdmin):
+    """List and detail views for entities."""
+
+    raw_id_fields = ['entity', 'model']
+    search_fields = ['entity']
+    readonly_fields = [
+        'pk',
+        'entity_link',
+        'digest',
+        'model_link',
+        'text_source',
+        'start',
+        'end',
+    ]
+    list_display = ['pk', 'entity_link', 'digest', 'model_link', 'text_source']
+
+    def entity_link(self, obj):
+        with self.collection.set_current():
+            return create_link('entity', obj.entity.pk, obj.entity.entity)
+
+    def model_link(self, obj):
+        with self.collection.set_current():
+            if obj.model:
+                return create_link('languagemodel', obj.model.pk, obj.model)
+            return '/'
+
+
+class LanguageModelAdmin(MultiDBModelAdmin):
+    """List and detail views for entities."""
+
+    search_fields = ['language_code', 'engine', 'description']
+    readonly_fields = [
+        'pk',
+        'language_code',
+        'engine',
+        'description',
+
+    ]
+    list_display = ['pk', 'language_code', 'engine', 'description']
+
+
 class FileAdmin(MultiDBModelAdmin):
     """List and detail views for the files."""
 
@@ -295,6 +375,9 @@ class FileAdmin(MultiDBModelAdmin):
             return blob_link(obj.blob.pk)
 
     blob_link.short_description = 'blob'
+
+
+
 
 
 class BlobAdmin(MultiDBModelAdmin):
@@ -438,6 +521,8 @@ class TaskDependencyAdmin(MultiDBModelAdmin):
     search_fields = ['prev', 'next', 'name']
 
 
+
+
 class DigestAdmin(MultiDBModelAdmin):
     """Listing and detail views for the Digests.
     """
@@ -559,6 +644,9 @@ def make_collection_admin_site(collection):
         site.register(models.OcrSource, OcrSourceAdmin)
         site.register(models.OcrDocument, MultiDBModelAdmin)
         site.register(models.Statistics, MultiDBModelAdmin)
+        site.register(models.Entity, EntityAdmin)
+        site.register(models.EntityHit, EntityHitAdmin)
+        site.register(models.LanguageModel, LanguageModelAdmin)
         return site
 
 
