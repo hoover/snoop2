@@ -27,6 +27,7 @@ from .utils import zulu
 from .analyzers import email
 from .analyzers import tika
 from .analyzers import exif
+from .analyzers import pdf_preview
 from . import ocr
 from ._file_types import FILE_TYPES
 from . import indexing
@@ -73,6 +74,9 @@ def launch(blob):
     if is_ocr_mime_type(blob.mime_type):
         for lang in get_collection_langs():
             depends_on[f'tesseract_{lang}'] = ocr.run_tesseract.laterz(blob, lang)
+
+    # if settings.SNOOP_PDF_PREVIEW_URL and pdf_preview.can_create(blob):
+    depends_on['get_pdf_preview'] = pdf_preview.get_pdf.laterz(blob)
 
     gather_task = gather.laterz(blob, depends_on=depends_on, retry=True, delete_extra_deps=True)
     index.laterz(blob, depends_on={'digests_gather': gather_task}, retry=True, queue_now=False)
@@ -166,6 +170,16 @@ def gather(blob, **depends_on):
                 exif_data = json.load(f)
             rv['location'] = exif_data.get('location')
             rv['date-created'] = exif_data.get('date-created')
+
+    # check if pdf-preview is available
+    rv['has-pdf-preview'] = False
+    pdf_preview = depends_on.get('get_pdf_preview')
+    if pdf_preview:
+        if isinstance(pdf_preview, SnoopTaskBroken):
+            rv['broken'].append(pdf_preview.reason)
+            log.debug('get_pdf_preview task is broken; skipping')
+        else:
+            rv['has-pdf-preview'] = True
 
     with models.Blob.create() as writer:
         writer.write(json.dumps(rv).encode('utf-8'))
@@ -560,6 +574,7 @@ def _get_document_content(digest, the_file=None):
         'ocrtext': {k: v for k, v in digest_data.get('ocrtext', {}).items() if v},
         'ocrpdf': digest_data.get('ocrpdf'),
         'ocrimage': digest_data.get('ocrimage'),
+        'has-preview-pdf': digest_data.get('has-pdf-preview'),
 
         # TODO 7zip, unzip, all of these will list the correct access/creation
         # times when listing, but don't preserve them when unpacking.

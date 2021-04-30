@@ -882,3 +882,20 @@ class Statistics(models.Model):
     class Meta:
 
         verbose_name_plural = 'statistics'
+
+
+class PdfPreview(models.Model):
+    """Database model for storing the pdf preview corresponding to a document.
+    """
+
+    blob = models.ForeignKey(
+        Blob,
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
+
+    pdf_preview = models.ForeignKey(
+        Blob,
+        on_delete=models.CASCADE,
+        related_name='+'
+    )

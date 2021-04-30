@@ -8,7 +8,6 @@ from django.conf import settings
 import requests
 from ..tasks import snoop_task, SnoopTaskBroken, returns_json_blob
 
-log = logging.getLogger(__name__)
 
 PDF_PREVIEW_MIME_TYPES = {}
 """List of mime types that the pdf generator supports.
@@ -22,15 +21,16 @@ def can_create(blob):
         return True
 
 
-def call_pdf_generator(data):
+def call_pdf_generator(data, filename):
     """Executes HTTP PUT request to pdf generator service."""
 
-    url = settings.PDF_PREVIEW_URL + '/convert/office'
+    url = settings.SNOOP_PDF_PREVIEW_URL + 'convert/office'
+    print(url)
 
-    resp = requests.post(url, files={'files': data})
+    resp = requests.post(url, files={'files': (filename, data)})
 
     if resp.status_code == 504:
-        raise SnoopTaskBroken('pdf generator timed out and returned http 500', 'pdf_previe_http_500')
+        raise SnoopTaskBroken('pdf generator timed out and returned http 504', 'pdf_previe_http_504')
 
     if (resp.status_code != 200
             or resp.headers['Content-Type'] != 'application/pdf'):
@@ -48,8 +48,15 @@ def get_pdf(blob):
     Adds the pdf preview to the database
     """
 
+    filename = models.File.objects.get(original=blob.pk).name
+    print('Filename:')
+    print(filename)
+
     with blob.open() as f:
-        resp = call_pdf_generator(f)
+        resp = call_pdf_generator(f, filename)
     blob_pdf_preview = models.Blob.create_from_bytes(resp)
     # create PDF object in pdf preview model
-    _, _ = 
+    _, _ = models.PdfPreview.objects.update_or_create(
+        blob=blob,
+        defaults={'pdf_preview': blob_pdf_preview}
+    )

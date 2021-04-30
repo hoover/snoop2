@@ -317,3 +317,9 @@ class TagViewSet(viewsets.ModelViewSet):
         """Collection-aware overload that also checks permission to write tag."""
         self.check_ownership(pk)
         return super().destroy(request, pk, **kwargs)
+
+
+@collection_view
+def pdf_preview(request, hash):
+    pdf_preview_entry = get_object_or_404(models.PdfPreview.objects, blob__pk=hash)
+    return FileResponse(pdf_preview_entry.pdf_preview.open(), content_type='application/pdf')
