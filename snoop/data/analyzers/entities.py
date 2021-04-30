@@ -171,14 +171,14 @@ def process_document(digest, rv):
         if text:
             results.update(extract_enitities(text, 'text', digest))
         if 'ocrtext' in rv:
-            for ocr_name, ocrtext in rv.get('ocrtext'):
+            for ocr_name, ocrtext in rv.get('ocrtext').items():
                 if ocrtext:
                     ocr_results = extract_enitities(ocrtext, ocr_name, digest)
                     results[f'{ocr_name}_lang'] = ocr_results['lang']
                     if 'entities' in results:
                         results['entities'].extend(ocr_results['entities'])
                         results['ent-ids'].extend(ocr_results['ent-ids'])
-                        for k, v in ocr_results:
+                        for k, v in ocr_results.items():
                             if k.startswith('entity-type.'):
                                 results[k].extend(v)
                     else:
@@ -188,7 +188,7 @@ def process_document(digest, rv):
         if text:
             results['lang'](get_language(text))
         if rv['ocrtext']:
-            for ocr_name, ocrtext in rv.get('ocrtext'):
+            for ocr_name, ocrtext in rv.get('ocrtext').items():
                 if ocrtext:
                     results[f'{ocr_name}_lang'] = get_language(ocrtext[:2500])
     return results
