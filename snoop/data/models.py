@@ -861,7 +861,7 @@ class LanguageModel(models.Model):
     description = models.CharField(max_length=256, unique=True)
 
     def __str__(self):
-        return self.description
+        return f'{self.description}'
 
     __repr__ = __str__
 

@@ -286,9 +286,8 @@ def import_index(delete=False, stream=None):
     with snapshot_repo() as (repo, repo_path):
         log.info('Unpack tar archive')
 
-        tar = tarfile.open(mode='r|*', fileobj=stream or sys.stdin.buffer)
-        tar.extractall(repo_path)
-        tar.close()
+        with tarfile.open(mode='r|*', fileobj=stream or sys.stdin.buffer) as tar:
+            tar.extractall(repo_path)
 
         snapshots_resp = requests.get(f'{repo}/*')
         check_response(snapshots_resp)
