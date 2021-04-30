@@ -75,8 +75,8 @@ def launch(blob):
         for lang in get_collection_langs():
             depends_on[f'tesseract_{lang}'] = ocr.run_tesseract.laterz(blob, lang)
 
-    # if settings.SNOOP_PDF_PREVIEW_URL and pdf_preview.can_create(blob):
-    depends_on['get_pdf_preview'] = pdf_preview.get_pdf.laterz(blob)
+    if settings.SNOOP_PDF_PREVIEW_URL and pdf_preview.can_create(blob):
+        depends_on['get_pdf_preview'] = pdf_preview.get_pdf.laterz(blob)
 
     gather_task = gather.laterz(blob, depends_on=depends_on, retry=True, delete_extra_deps=True)
     index.laterz(blob, depends_on={'digests_gather': gather_task}, retry=True, queue_now=False)

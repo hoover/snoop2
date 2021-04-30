@@ -9,9 +9,21 @@ import requests
 from ..tasks import snoop_task, SnoopTaskBroken, returns_json_blob
 
 
-PDF_PREVIEW_MIME_TYPES = {}
+PDF_PREVIEW_MIME_TYPES = {
+    'text/plain',
+    'text/rtf',
+    'application/msword',
+    'vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msexcel',
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/mspowerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.oasis.opendocument.presentation',
+    'application/vnd.oasis.opendocument.spreadsheet',
+    'application/vnd.oasis.opendocument.text',
+}
 """List of mime types that the pdf generator supports.
-Based on [[insert link here]]
+Based on [[https://thecodingmachine.github.io/gotenberg/#office.basic]].
 """
 
 
