@@ -36,7 +36,6 @@ def blob_link(blob_pk):
     return mark_safe(f'<a href="{url}">{blob_pk[:10]}...{blob_pk[-4:]}</a>')
 
 
-
 def create_link(model_name, pk, url_description):
     """Creates a link to any other Data entry in the database.
 
@@ -269,7 +268,6 @@ class DirectoryAdmin(MultiDBModelAdmin):
     list_display = ['pk', '__str__', 'name', 'date_created', 'date_modified']
 
 
-
 class EntityAdmin(MultiDBModelAdmin):
     """List and detail views for entities."""
 
@@ -375,9 +373,6 @@ class FileAdmin(MultiDBModelAdmin):
             return blob_link(obj.blob.pk)
 
     blob_link.short_description = 'blob'
-
-
-
 
 
 class BlobAdmin(MultiDBModelAdmin):
@@ -519,8 +514,6 @@ class TaskDependencyAdmin(MultiDBModelAdmin):
     readonly_fields = ['prev', 'next', 'name']
     list_display = ['pk', 'name', 'prev', 'next']
     search_fields = ['prev', 'next', 'name']
-
-
 
 
 class DigestAdmin(MultiDBModelAdmin):

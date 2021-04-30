@@ -5,7 +5,6 @@
 
 from .. import models
 from django.conf import settings
-from urllib.parse import urljoin
 import requests
 from collections import defaultdict
 
@@ -99,12 +98,12 @@ def create_db_entries(entity, model, language, text_source, digest):
     db_ent, _ = models.Entity.objects.get_or_create(
         entity=entity['text'],
         type=models.EntityType.objects.get_or_create(type=entity['type'])[0]
-        )
+    )
     models.EntityHit.objects.get_or_create(
         entity=db_ent,
         model=models.LanguageModel.objects.get_or_create(
             language_code=language,
-            engine = engine,
+            engine=engine,
             description=model)[0],
         text_source=text_source,
         start=entity['start'],
@@ -136,7 +135,7 @@ def extract_enitities(text, text_source, digest):
     ents = nlp_response['entities']
     results = {}
     results['ent-ids'] = list(set([create_db_entries(entity, nlp_response['model'],
-                        nlp_response['language'], text_source, digest) for entity in ents]))
+                                   nlp_response['language'], text_source, digest) for entity in ents]))
     results['lang'] = nlp_response['language']
     results['entities'] = [k['text'] for k in ents]
     unique_ents = set([(k['text'], k['type']) for k in ents])
