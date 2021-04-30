@@ -80,6 +80,12 @@ services:
   - name: rabbit-v
     path: /var/lib/rabbitmq
 
+- name: snoop-nlp-service
+  image: liquidinvestigations/nlp-service:initial_droned_service
+  environment:
+    NLP_SERVICE_PRESET: "full_sm"
+    NLP_SERVICE_FALLBACK_LANGUAGE: "en"
+
 - name: snoop-tika
   image: logicalspark/docker-tikaserver
 
@@ -122,13 +128,14 @@ steps:
   - name: test-collections-v
     path: /opt/hoover/collections/testdata
   environment:
-    WAIT_HOSTS: search-es:9200, snoop-pg:5432, snoop-tika:9998
+    WAIT_HOSTS: search-es:9200, snoop-pg:5432, snoop-tika:9998, snoop-nlp-service:5000
     WAIT_HOSTS_TIMEOUT: 60
     SNOOP_DB: "postgresql://snoop:snoop@snoop-pg:5432/snoop"
     SNOOP_COLLECTIONS: '[{"name": "testdata", "process": true}]'
     SNOOP_AMQP_URL: "amqp://snoop-rabbitmq"
     SNOOP_TIKA_URL: "http://snoop-tika:9998"
     SNOOP_ES_URL: "http://search-es:9200"
+    SNOOP_NLP_URL: "http://snoop-nlp-service:5000"
     SNOOP_COLLECTION_ROOT: "/opt/hoover/collections"
     SNOOP_BLOB_STORAGE: "/opt/hoover/snoop/blobs"
     USER_MODE: "TEST"
