@@ -77,7 +77,7 @@ def get_pdf(blob):
 
     Adds the pdf preview to the database
     """
-    filename = models.File.objects.get(original=blob.pk).name
+    filename = models.File.objects.filter(original=blob.pk)[0].name
     print('Filename:')
     print(filename)
     filename_root, ext = os.path.splitext(filename)
