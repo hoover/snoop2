@@ -4,7 +4,6 @@ The service used can be found here: [[https://github.com/thecodingmachine/gotenb
 """
 
 from .. import models
-import pdb
 from django.conf import settings
 import requests
 from ..tasks import snoop_task, SnoopTaskBroken, returns_json_blob
@@ -78,7 +77,6 @@ def get_pdf(blob):
 
     Adds the pdf preview to the database
     """
-    pdb.set_trace()
     filename = models.File.objects.get(original=blob.pk).name
     print('Filename:')
     print(filename)
