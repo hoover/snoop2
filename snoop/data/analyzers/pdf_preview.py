@@ -42,19 +42,21 @@ PDF_PREVIEW_EXTENSIONS = {
     '.pptx',
     '.odp',
 }
+"""List of file extensions that the pdf generator supports.
+Based on [[https://thecodingmachine.github.io/gotenberg/#office.basic]].
+"""
 
 
 def can_create(blob):
-    """Checks if pdf generator can process this file."""
+    """Checks if the pdf generator can process this file."""
     if blob.mime_type in PDF_PREVIEW_MIME_TYPES:
         return True
 
 
 def call_pdf_generator(data, filename):
-    """Executes HTTP PUT request to pdf generator service."""
+    """Executes HTTP PUT request to the pdf generator service."""
 
     url = settings.SNOOP_PDF_PREVIEW_URL + 'convert/office'
-    print(url)
 
     resp = requests.post(url, files={'files': (filename, data)})
 
@@ -78,8 +80,6 @@ def get_pdf(blob):
     Adds the pdf preview to the database
     """
     filename = models.File.objects.filter(original=blob.pk)[0].name
-    print('Filename:')
-    print(filename)
     filename_root, ext = os.path.splitext(filename)
     if ext not in PDF_PREVIEW_EXTENSIONS:
         ext = mimetypes.guess_extension(blob.mime_type)
