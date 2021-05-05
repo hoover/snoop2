@@ -574,7 +574,7 @@ def _get_document_content(digest, the_file=None):
         'ocrtext': {k: v for k, v in digest_data.get('ocrtext', {}).items() if v},
         'ocrpdf': digest_data.get('ocrpdf'),
         'ocrimage': digest_data.get('ocrimage'),
-        'has-preview-pdf': digest_data.get('has-pdf-preview'),
+        'has-pdf-preview': digest_data.get('has-pdf-preview'),
 
         # TODO 7zip, unzip, all of these will list the correct access/creation
         # times when listing, but don't preserve them when unpacking.
