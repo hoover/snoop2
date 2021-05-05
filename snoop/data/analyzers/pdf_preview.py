@@ -4,9 +4,12 @@ The service used can be found here: [[https://github.com/thecodingmachine/gotenb
 """
 
 from .. import models
+import pdb
 from django.conf import settings
 import requests
 from ..tasks import snoop_task, SnoopTaskBroken, returns_json_blob
+import os
+import mimetypes
 
 
 PDF_PREVIEW_MIME_TYPES = {
@@ -26,6 +29,21 @@ PDF_PREVIEW_MIME_TYPES = {
 Based on [[https://thecodingmachine.github.io/gotenberg/#office.basic]].
 """
 
+PDF_PREVIEW_EXTENSIONS = {
+    '.txt',
+    '.rtf',
+    '.fodt',
+    '.doc',
+    '.docx',
+    '.odt',
+    '.xls',
+    '.xlsx',
+    '.ods',
+    '.ppt',
+    '.pptx',
+    '.odp',
+}
+
 
 def can_create(blob):
     """Checks if pdf generator can process this file."""
@@ -42,10 +60,11 @@ def call_pdf_generator(data, filename):
     resp = requests.post(url, files={'files': (filename, data)})
 
     if resp.status_code == 504:
-        raise SnoopTaskBroken('pdf generator timed out and returned http 504', 'pdf_previe_http_504')
+        raise SnoopTaskBroken('pdf generator timed out and returned http 504', 'pdf_preview_http_504')
 
     if (resp.status_code != 200
             or resp.headers['Content-Type'] != 'application/pdf'):
+        print(resp.content)
         raise RuntimeError(f'Unexpected response from pdf generator: {resp}')
 
     return resp.content
@@ -59,13 +78,18 @@ def get_pdf(blob):
 
     Adds the pdf preview to the database
     """
-
+    pdb.set_trace()
     filename = models.File.objects.get(original=blob.pk).name
     print('Filename:')
     print(filename)
+    filename_root, ext = os.path.splitext(filename)
+    if ext not in PDF_PREVIEW_EXTENSIONS:
+        ext = mimetypes.guess_extension(blob.mime_type)
+        if ext not in PDF_PREVIEW_EXTENSIONS:
+            raise SnoopTaskBroken('no valid file extension found', 'invalid_file_extension')
 
     with blob.open() as f:
-        resp = call_pdf_generator(f, filename)
+        resp = call_pdf_generator(f, filename_root + ext)
     blob_pdf_preview = models.Blob.create_from_bytes(resp)
     # create PDF object in pdf preview model
     _, _ = models.PdfPreview.objects.update_or_create(
